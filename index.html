@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dyaan's 18th | The Muse</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary-purple: #2d0b5a;
+      --light-purple: #9d50bb;
+      --accent-lavender: #e0c3fc;
+      --deep-bg: #0a0518;
+      --glass: rgba(255, 255, 255, 0.07);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--deep-bg);
+      background: radial-gradient(circle at center, #1a0a33 0%, #0a0518 100%);
+      color: #e0e0e0;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* CUSTOM PURPLE SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(to bottom, var(--light-purple), var(--primary-purple));
+      border-radius: 10px;
+    }
+
+    #bg-stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .screen {
+      min-height: 100vh;
+      display: none;
+      padding: 25px;
+      z-index: 2;
+      position: relative;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .main-card {
+      background: var(--glass);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid rgba(157, 80, 187, 0.3);
+      border-radius: 30px;
+      padding: 35px 25px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+
+    .purple-text {
+      color: var(--light-purple);
+      text-shadow: 0 0 10px rgba(157, 80, 187, 0.5);
+    }
+
+    input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(157, 80, 187, 0.4);
+      padding: 16px;
+      border-radius: 15px;
+      color: white;
+      width: 100%;
+      margin: 20px 0;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    .btn-action {
+      background: linear-gradient(45deg, #6a11cb 0%, #9d50bb 100%);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 50px;
+      font-weight: 600;
+      width: 100%;
+      box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+      transition: 0.3s;
+    }
+
+    /* Hand/Finger Instruction Animation */
+    @keyframes tapFinger {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .finger-guide {
+      font-size: 1.5rem;
+      animation: tapFinger 1s infinite;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    /* Shower Elements Styling */
+    .shower-item {
+      position: fixed;
+      top: -50px;
+      z-index: 99;
+      user-select: none;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+      }
+    }
+
+    .quotes-container {
+      max-height: 350px;
+      overflow-y: auto;
+      margin: 20px 0;
+      padding-right: 8px;
+    }
+
+    .quote-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      border-left: 3px solid var(--light-purple);
+      text-align: left;
+    }
+
+    .quote-text {
+      font-style: italic;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #ccc;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, #2d0b5a 0%, #0a0518 100%);
+      padding: 40px 25px;
+      border-radius: 30px;
+      border: 1px solid var(--light-purple);
+      text-align: center;
+      max-width: 340px;
+      transform: scale(0.7);
+      transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: scale(1);
+    }
+
+    .modal-content h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: var(--accent-lavender);
+      margin-bottom: 15px;
+    }
+
+    .candle {
+      font-size: 3rem;
+      cursor: pointer;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .extinguished {
+      filter: grayscale(1);
+      opacity: 0.4;
+      transform: scale(0.9);
+      transition: 0.5s;
+    }
+  </style>
+</head>
+
+<body>
+
+  <canvas id="bg-stars"></canvas>
+
+  <section id="screen1" class="screen active">
+    <div class="main-card">
+      <h2 style="font-size: 0.6rem; letter-spacing: 4px; color: var(--light-purple); margin-bottom: 10px;">AUTHORIZED
+        ACCESS ONLY</h2>
+      <h1>The <span class="purple-text">18th</span> Verse</h1>
+      <input type="text" id="nameInput" placeholder="Enter her name..." />
+      <button class="btn-action" onclick="checkName()">Unlock Gallery</button>
+      <p id="errorMsg" style="margin-top: 15px; font-size: 0.75rem; color: #ff4d4d;"></p>
+    </div>
+  </section>
+
+  <section id="screen2" class="screen">
+    <div class="main-card">
+      <h1>Chapter <span class="purple-text">18</span></h1>
+      <div style="margin: 25px 0;">
+        <span class="finger-guide" id="guide">👇</span>
+        <span id="candle" class="candle" onclick="blowCandle()">🕯️</span>
+        <div style="font-size: 4rem;">🎂</div>
+      </div>
+      <p id="wishText"
+        style="color: var(--accent-lavender); font-family: 'Dancing Script', cursive; font-size: 1.4rem;">Tap the candle
+        to blow it out...</p>
+      <button id="nextBtn" class="btn-action" style="display:none; margin-top: 20px;" onclick="go(3)">See the 18
+        Thoughts →</button>
+    </div>
+  </section>
+
+  <section id="screen3" class="screen">
+    <div class="main-card">
+      <h1>18 Years <span class="purple-text">of Grace</span></h1>
+      <div class="quotes-container" id="quotesBox"></div>
+      <button class="btn-action" onclick="showFinalModal()">A Final Note</button>
+    </div>
+  </section>
+
+  <div class="modal-overlay" id="finalModal">
+    <div class="modal-content">
+      <h2>Happy Birthday, Dyaan.</h2>
+      <p style="font-size: 0.95rem; line-height: 1.6; color: #eee; margin-bottom: 20px;">
+        "Miles mean nothing when someone means everything." <br><br>
+        Even though miles separate us today, my thoughts are right there with you. You are loved more than you know. May
+        your 18th year be as magical as the quiet moments you don't even know I've cherished.
+      </p>
+      <button class="btn-action" onclick="closeModal()">Close with a Smile</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg-stars');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.onresize = resize; resize();
+    for (let i = 0; i < 100; i++) { stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, s: Math.random() * 2, d: Math.random() * 0.3 }); }
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#9d50bb";
+      stars.forEach(s => {
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI * 2); ctx.fill();
+        s.y -= s.d; if (s.y < 0) s.y = canvas.height;
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // BALLOONS & FLOWERS SHOWER FUNCTION
+    function celebrationShower() {
+      const emojis = ['🎈', '🌸', '💜', '✨', '🌺', '🎈'];
+      const container = document.body;
+
+      for (let i = 0; i < 40; i++) {
+        const item = document.createElement('div');
+        item.className = 'shower-item';
+        item.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+        item.style.left = Math.random() * 100 + 'vw';
+        item.style.fontSize = Math.random() * 20 + 20 + 'px';
+        item.style.animationDuration = Math.random() * 3 + 3 + 's'; // 3 to 6 seconds fall
+        item.style.opacity = Math.random() * 0.5 + 0.5;
+
+        container.appendChild(item);
+
+        // Remove item after animation
+        setTimeout(() => { item.remove(); }, 6000);
+      }
+    }
+
+    const eighteenQuotes = [
+      "Distance only makes the thoughts of you clearer.",
+      "18 years of you being you. That's a lot of goodness for one world.",
+      "I might not be there to see you cut the cake, but I'm definitely cheering for you from here.",
+      "Even from miles away, your smile is the highlight of my day.",
+      "18 is a big deal, and so are you. Hope today is exactly what you want it to be.",
+      "You're the only person I don't mind missing sleep for.",
+      "The miles between us don't change how much I appreciate you.",
+      "Seeing you grow into who you are today has been a privilege.",
+      "I hope your 18th year brings you as much peace as you give me.",
+      "You're not just a year older; you're a year more incredible.",
+      "Sometimes I see something beautiful and instantly wish you were there to see it too.",
+      "You have this quiet way of making everything better just by being in it.",
+      "I don't need to be there to know you're looking amazing today.",
+      "Happy 18th to the girl who's always on my mind, no matter the distance.",
+      "May this year be full of all the things that make you laugh.",
+      "You’re 18 now—the world is officially yours. Take care of it.",
+      "I'm lucky to know you, even if it's from a few time zones away.",
+      "Here’s to you, Dyaan. Today and every day."
+    ];
+
+
+    function checkName() {
+      if (document.getElementById('nameInput').value.toLowerCase().trim() === 'dyaan') {
+        celebrationShower()
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#9d50bb', '#ffffff'] });
+        go(2);
+      } else { document.getElementById('errorMsg').innerText = "Incorrect name. Try again."; }
+    }
+
+    function blowCandle() {
+      document.getElementById('candle').classList.add('extinguished');
+      document.getElementById('guide').style.display = 'none';
+      document.getElementById('wishText').innerText = "Your wish is now a star. ✨";
+      confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
+      setTimeout(() => { document.getElementById('nextBtn').style.display = 'block'; }, 800);
+    }
+
+    function go(n) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen' + n).classList.add('active');
+      if (n === 3) loadQuotes();
+    }
+
+    function loadQuotes() {
+      document.getElementById('quotesBox').innerHTML = eighteenQuotes.map((q, i) => `
+      <div class="quote-item">
+        <p class="quote-text">"${q}"</p>
+      </div>
+    `).join('');
+    }
+
+    function showFinalModal() {
+      document.getElementById('finalModal').classList.add('show');
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      celebrationShower();
+    }
+
+    function closeModal() {
+      document.getElementById('finalModal').classList.remove('show');
+    }
+  </script>
+
+</body>
+
+</html>
